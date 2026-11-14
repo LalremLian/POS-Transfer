@@ -13,6 +13,10 @@ Failure mapExceptionToFailure(Object error, [StackTrace? stack]) {
     return const TransferCancelledFailure();
   }
 
+  if (error is FileNotFoundException) {
+    return const FileNotFoundFailure();
+  }
+
   if (error is InsufficientStorageException) {
     return const InsufficientStorageFailure();
   }
@@ -99,6 +103,7 @@ Failure _fromStatusCode(int? code, String? message) {
     403 => const ForbiddenFailure(),
     404 => const NotFoundFailure(),
     413 => const FileTooLargeFailure(),
+    415 => const UnsupportedFileTypeFailure(),
     429 => const RateLimitFailure(),
     500 || 502 || 503 || 504 => ServerFailure(msg, statusCode: code),
     _ => ServerFailure(msg, statusCode: code),

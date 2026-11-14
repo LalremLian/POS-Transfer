@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Transfer history screen — full implementation added in Phase 9.
 class TransferHistoryScreen extends StatelessWidget {
   const TransferHistoryScreen({super.key});
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Transfer detail screen — full implementation added in Phase 9.
 class TransferDetailScreen extends StatelessWidget {
   const TransferDetailScreen({super.key, required this.transferId});
   final String transferId;

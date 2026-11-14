@@ -109,6 +109,10 @@ class InvalidFileFailure extends Failure {
   const InvalidFileFailure([super.message = 'Invalid or unreadable file']);
 }
 
+class UnsupportedFileTypeFailure extends Failure {
+  const UnsupportedFileTypeFailure([super.message = 'This file type is not allowed by the server']);
+}
+
 // Auth
 
 class AuthFailure extends Failure {
