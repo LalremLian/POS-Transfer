@@ -20,7 +20,8 @@ class ApiConstants {
   /// POST
   static const String uploadFile = '/upload';
 
-  /// DELETE
+  /// DELETE ?file=NAME
+  static const String deleteFile = '/delete';
 
   // Query param keys
   static const String fileParam = 'file';

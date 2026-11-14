@@ -417,17 +417,19 @@ class TransferManager {
   }) {
     final t = _transfers[id];
     if (t == null) return;
+    // Use actualSize as the authoritative byte count so progress always
+    // shows 100% — the header totalBytes can differ slightly from actual.
+    final finalSize = (remoteFileSize != null && remoteFileSize > 0)
+        ? remoteFileSize
+        : (t.totalBytes > 0 ? t.totalBytes : t.transferredBytes);
     final updated = t.copyWith(
       status: TransferStatus.completed,
       remoteFileName: remoteFileName ?? t.remoteFileName,
-      totalBytes: remoteFileSize != null && remoteFileSize > 0
-          ? remoteFileSize
-          : t.totalBytes,
-      transferredBytes: t.totalBytes > 0
-          ? t.totalBytes
-          : t.transferredBytes,
+      totalBytes: finalSize,
+      transferredBytes: finalSize, // always 100%
       speedBytesPerSec: 0,
       localChecksum: localChecksum ?? t.localChecksum,
+      completedAt: DateTime.now(),
     );
     _transfers[id] = updated;
     _lastUiEmit[id] = DateTime.now();

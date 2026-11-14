@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/di/providers.dart';
+import '../../../downloads/domain/entities/download_executor.dart';
+import '../../../downloads/presentation/providers/download_providers.dart';
 import '../../../uploads/domain/entities/upload_executor.dart';
 import '../../../uploads/presentation/providers/upload_providers.dart';
 import '../../data/repositories/transfer_repository_impl.dart';
@@ -26,6 +28,14 @@ final transferManagerProvider = Provider<TransferManager>((ref) {
     config: ref.watch(transferConfigProvider),
   );
   manager.uploadExecutor = uploadExecutor.call;
+
+  // Wire download executor (Phase 5).
+  final downloadExecutor = DownloadExecutor(
+    repository: ref.watch(downloadRepositoryProvider),
+    manager: manager,
+    config: ref.watch(transferConfigProvider),
+  );
+  manager.downloadExecutor = downloadExecutor.call;
 
   ref.onDispose(manager.dispose);
   // Restore persisted state once on creation. Runs async; streams populate
