@@ -6,7 +6,6 @@ import '../../domain/entities/transfer_manager.dart';
 import '../providers/transfer_providers.dart';
 import '../widgets/transfer_card.dart';
 
-/// Full transfer history with filter chips (8.4).
 class TransferHistoryScreen extends ConsumerStatefulWidget {
   const TransferHistoryScreen({super.key});
 

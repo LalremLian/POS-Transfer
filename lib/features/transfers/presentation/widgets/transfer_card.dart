@@ -8,8 +8,6 @@ import '../../domain/entities/transfer_entity.dart';
 import '../../domain/entities/transfer_manager.dart';
 import '../providers/transfer_providers.dart';
 
-/// Isolated transfer card — subscribes ONLY to its own transferProvider(id).
-/// Progress on another transfer never rebuilds this widget (8.2).
 class TransferCard extends ConsumerWidget {
   const TransferCard({super.key, required this.transferId});
   final String transferId;
@@ -43,7 +41,7 @@ class _TransferCardContent extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header row ────────────────────────────────────────────────
+          // Header row
           Row(
             children: [
               Icon(
@@ -64,7 +62,7 @@ class _TransferCardContent extends ConsumerWidget {
             ],
           ),
 
-          // ── Progress bar (only while active) ─────────────────────────
+          // Progress bar (only while active)
           if (transfer.isActive) ...[
             const SizedBox(height: 10),
             ClipRRect(
@@ -100,7 +98,7 @@ class _TransferCardContent extends ConsumerWidget {
             ),
           ],
 
-          // ── Completed: show size and checksum hint ─────────────────────
+          // Completed: show size and checksum hint
           if (transfer.status == TransferStatus.completed) ...[
             const SizedBox(height: 4),
             Text(
@@ -111,7 +109,7 @@ class _TransferCardContent extends ConsumerWidget {
             ),
           ],
 
-          // ── Error message ─────────────────────────────────────────────
+          // Error message
           if (transfer.errorMessage != null) ...[
             const SizedBox(height: 6),
             Text(
@@ -126,7 +124,7 @@ class _TransferCardContent extends ConsumerWidget {
 
           const SizedBox(height: 10),
 
-          // ── Action row ────────────────────────────────────────────────
+          // Action row
           Row(
             children: [
               ..._actions(context, manager),
