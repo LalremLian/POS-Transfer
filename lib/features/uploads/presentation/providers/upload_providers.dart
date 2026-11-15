@@ -45,13 +45,16 @@ class UploadSelection {
     String? error,
     bool clearError = false,
     bool clearSelection = false,
+    bool clearActiveTransfer = false,
   }) {
     return UploadSelection(
       filePath: clearSelection ? null : (filePath ?? this.filePath),
       fileName: clearSelection ? null : (fileName ?? this.fileName),
       fileSize: clearSelection ? null : (fileSize ?? this.fileSize),
       mimeType: clearSelection ? null : (mimeType ?? this.mimeType),
-      activeTransferId: activeTransferId ?? this.activeTransferId,
+      activeTransferId: clearActiveTransfer
+          ? null
+          : (activeTransferId ?? this.activeTransferId),
       isPicking: isPicking ?? this.isPicking,
       error: clearError ? null : (error ?? this.error),
     );
@@ -89,6 +92,7 @@ class UploadNotifier extends Notifier<UploadSelection> {
         fileSize: f.size,
         mimeType: FileUtils.mimeTypeFor(f.name),
         isPicking: false,
+        clearActiveTransfer: true,
         clearError: true,
       );
     } catch (_) {
@@ -118,11 +122,15 @@ class UploadNotifier extends Notifier<UploadSelection> {
   }
 
   void clearSelection() {
-    state = state.copyWith(clearSelection: true, clearError: true);
+    state = state.copyWith(
+      clearSelection: true,
+      clearActiveTransfer: true,
+      clearError: true,
+    );
   }
 
   void clearActive() {
-    state = state.copyWith(activeTransferId: null, clearError: true);
+    state = state.copyWith(clearActiveTransfer: true, clearError: true);
   }
 
   void clearError() {

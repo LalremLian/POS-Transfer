@@ -2,8 +2,7 @@ import '../../../../core/services/local_database_service.dart';
 import '../../domain/entities/transfer_entity.dart';
 import '../../domain/repositories/transfer_repository.dart';
 
-/// SharedPreferences-backed implementation (3.3).
-///
+/// SharedPreferences-backed implementation
 /// Transfers are stored as a JSON list under one key (see LocalDatabaseService).
 /// For dozens of transfers this is fine; swap to drift/sqflite if scale demands.
 class TransferRepositoryImpl implements TransferRepository {

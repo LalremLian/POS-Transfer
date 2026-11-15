@@ -29,16 +29,9 @@ class _PosTransferAppState extends ConsumerState<PosTransferApp> {
 
   void _wireNotificationCallback() {
     if (_callbackWired) return;
-    final router = ref.read(appRouterProvider);
     NotificationService.instance.setTapCallback((payload) {
-      // Map payload strings to routes.
-      final route = switch (payload) {
-        'upload'   => Routes.upload,
-        'download' => Routes.download,
-        _          => Routes.dashboard,
-      };
-      // Push onto the existing stack so the user can go back.
-      router.go(route);
+      final route = Routes.payloadToRoute(payload);
+      ref.read(appRouterProvider).go(route);
     });
     _callbackWired = true;
   }
