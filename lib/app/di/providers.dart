@@ -11,8 +11,6 @@ import '../../core/services/local_database_service.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/transfer/transfer_config.dart';
 
-// Infrastructure
-
 final sharedPreferencesProvider = Provider<SharedPreferences>(
   (ref) => throw UnimplementedError('Override at startup'),
 );

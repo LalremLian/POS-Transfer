@@ -29,9 +29,10 @@ class DownloadScreen extends ConsumerWidget {
       ),
       body: filesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => _ErrorView(message: e.toString(), onRetry: () {
-          ref.read(remoteFilesProvider.notifier).refresh();
-        }),
+        error: (e, _) => _ErrorView(
+          message: e.toString(),
+          onRetry: () => ref.read(remoteFilesProvider.notifier).refresh(),
+        ),
         data: (files) => files.isEmpty
             ? const _EmptyView()
             : ListView.separated(
@@ -45,7 +46,7 @@ class DownloadScreen extends ConsumerWidget {
   }
 }
 
-// Remote file card
+// ── Remote file card ─────────────────────────────────────────────────────
 
 class _RemoteFileCard extends ConsumerWidget {
   const _RemoteFileCard({required this.file});
@@ -53,7 +54,6 @@ class _RemoteFileCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Check if this file already has an active transfer.
     final roster = ref.watch(transferRosterProvider).valueOrNull ?? [];
     final existing = roster.where((t) =>
         t.type == TransferType.download &&
@@ -76,7 +76,9 @@ class _RemoteFileCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        file.originalName.isNotEmpty ? file.originalName : file.name,
+                        file.originalName.isNotEmpty
+                            ? file.originalName
+                            : file.name,
                         style: Theme.of(context).textTheme.titleSmall,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -129,7 +131,8 @@ class _DownloadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FilledButton.icon(
-      onPressed: () => ref.read(downloadNotifierProvider.notifier).startDownload(file),
+      onPressed: () =>
+          ref.read(downloadNotifierProvider.notifier).startDownload(file),
       icon: const Icon(Icons.download, size: 18),
       label: const Text('Download'),
       style: FilledButton.styleFrom(
@@ -140,7 +143,7 @@ class _DownloadButton extends ConsumerWidget {
   }
 }
 
-// Active transfer progress row
+// ── Active transfer progress ──────────────────────────────────────────────
 
 class _ActiveTransferRow extends ConsumerWidget {
   const _ActiveTransferRow({required this.transferId});
@@ -148,11 +151,11 @@ class _ActiveTransferRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transferAsync = ref.watch(transferProvider(transferId));
-    return transferAsync.when(
+    final async = ref.watch(transferProvider(transferId));
+    return async.when(
       loading: () => const LinearProgressIndicator(),
-      error: (e, _) => Text(e.toString(),
-          style: const TextStyle(color: Colors.red, fontSize: 12)),
+      error: (e, _) =>
+          Text(e.toString(), style: const TextStyle(color: Colors.red, fontSize: 12)),
       data: (t) => _TransferProgress(transfer: t),
     );
   }
@@ -170,7 +173,15 @@ class _TransferProgress extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LinearProgressIndicator(value: transfer.progress),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: transfer.status == TransferStatus.queued
+                ? null
+                : transfer.progress,
+            minHeight: 6,
+          ),
+        ),
         const SizedBox(height: 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -182,14 +193,13 @@ class _TransferProgress extends ConsumerWidget {
             ),
             Text(
               FileUtils.formatSpeed(transfer.speedBytesPerSec),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: cs.onSurfaceVariant),
             ),
-            Text(
-              '${(transfer.progress * 100).toStringAsFixed(0)}%',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            Text('${(transfer.progress * 100).toStringAsFixed(0)}%',
+                style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
         if (transfer.errorMessage != null)
@@ -218,7 +228,8 @@ class _ActionBar extends StatelessWidget {
                 danger: true),
           ],
         TransferStatus.paused => [
-            _Btn(Icons.play_arrow, 'Resume', () => manager.resume(transfer.id)),
+            _Btn(Icons.play_arrow, 'Resume',
+                () => manager.resume(transfer.id)),
             _Btn(Icons.cancel, 'Cancel', () => manager.cancel(transfer.id),
                 danger: true),
           ],
@@ -228,7 +239,8 @@ class _ActionBar extends StatelessWidget {
                 () => manager.removeCompleted(transfer.id)),
           ],
         TransferStatus.completed => [
-            _Btn(Icons.check, 'Done', () => manager.removeCompleted(transfer.id)),
+            _Btn(Icons.check, 'Done',
+                () => manager.removeCompleted(transfer.id)),
           ],
         _ => [],
       },
@@ -260,7 +272,7 @@ class _Btn extends StatelessWidget {
   }
 }
 
-// Status chip
+// ── Status chip ───────────────────────────────────────────────────────────
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status});
@@ -269,12 +281,12 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, color) = switch (status) {
-      TransferStatus.queued => ('Queued', Colors.grey),
+      TransferStatus.queued    => ('Queued', Colors.grey),
       TransferStatus.preparing => ('Starting', Colors.blue),
-      TransferStatus.running => ('Downloading', Colors.blue),
-      TransferStatus.paused => ('Paused', Colors.amber),
+      TransferStatus.running   => ('Downloading', Colors.blue),
+      TransferStatus.paused    => ('Paused', Colors.amber),
       TransferStatus.completed => ('Done', Colors.green),
-      TransferStatus.failed => ('Failed', Colors.red),
+      TransferStatus.failed    => ('Failed', Colors.red),
       TransferStatus.cancelled => ('Cancelled', Colors.grey),
     };
     return Container(
@@ -290,7 +302,7 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-// Empty / error views
+// ── Empty / error ─────────────────────────────────────────────────────────
 
 class _EmptyView extends StatelessWidget {
   const _EmptyView();

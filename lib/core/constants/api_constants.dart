@@ -6,20 +6,16 @@ class ApiConstants {
   // Auth
   /// POST
   static const String register = '/register';
-
   /// POST
   static const String token = '/token';
 
   // ── Files ─────────────────────────────────────────────────────────────────
   /// GET
   static const String getFiles = '/get';
-
   /// GET
   static const String downloadFile = '/get';
-
   /// POST
   static const String uploadFile = '/upload';
-
   /// DELETE ?file=NAME
   static const String deleteFile = '/delete';
 

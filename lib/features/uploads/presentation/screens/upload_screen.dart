@@ -24,20 +24,18 @@ class UploadScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // File selection
             _FileSelectionCard(selection: selection),
             const SizedBox(height: 16),
 
-            // Primary actions
             if (!selection.hasSelection)
               FilledButton.icon(
                 onPressed: selection.isPicking
                     ? null
                     : () => ref.read(uploadNotifierProvider.notifier).pickFile(),
                 icon: selection.isPicking
-                    ? SizedBox.square(
+                    ? const SizedBox.square(
                         dimension: 18,
-                        child: const CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.attach_file),
                 label: Text(selection.isPicking ? 'Opening…' : 'Select File'),
@@ -48,8 +46,7 @@ class UploadScreen extends ConsumerWidget {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: activeId == null
-                          ? () =>
-                              ref.read(uploadNotifierProvider.notifier).startUpload()
+                          ? () => ref.read(uploadNotifierProvider.notifier).startUpload()
                           : null,
                       icon: const Icon(Icons.upload_file),
                       label: const Text('Start Upload'),
@@ -59,9 +56,7 @@ class UploadScreen extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: activeId != null
                         ? null
-                        : () => ref
-                            .read(uploadNotifierProvider.notifier)
-                            .clearSelection(),
+                        : () => ref.read(uploadNotifierProvider.notifier).clearSelection(),
                     icon: const Icon(Icons.close),
                     label: const Text('Clear'),
                   ),
@@ -70,14 +65,9 @@ class UploadScreen extends ConsumerWidget {
             ],
             const SizedBox(height: 24),
 
-            // Progress + actions for the active transfer
             if (activeId != null && transferAsync != null)
-              _ActiveTransferSection(
-                transferAsync: transferAsync,
-                ref: ref,
-              ),
+              _ActiveTransferSection(transferAsync: transferAsync, ref: ref),
 
-            // Error
             if (selection.error != null) ...[
               const SizedBox(height: 16),
               _ErrorBanner(message: selection.error!),
@@ -92,7 +82,7 @@ class UploadScreen extends ConsumerWidget {
   }
 }
 
-// File selection card
+// ── File selection card ──────────────────────────────────────────────────
 
 class _FileSelectionCard extends StatelessWidget {
   const _FileSelectionCard({required this.selection});
@@ -112,17 +102,14 @@ class _FileSelectionCard extends StatelessWidget {
               Text('No file selected',
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 4),
-              Text(
-                'Pick a CSV, image, video, or any file to upload',
-                style: Theme.of(context).textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
+              Text('Pick a CSV, image, video, or any file to upload',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center),
             ],
           ),
         ),
       );
     }
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -138,12 +125,10 @@ class _FileSelectionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    selection.fileName!,
-                    style: Theme.of(context).textTheme.titleSmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(selection.fileName!,
+                      style: Theme.of(context).textTheme.titleSmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Text(
                     '${FileUtils.formatBytes(selection.fileSize ?? 0)} · '
@@ -160,10 +145,11 @@ class _FileSelectionCard extends StatelessWidget {
   }
 }
 
-// Active transfer progress + actions
+// ── Active transfer section ───────────────────────────────────────────────
 
 class _ActiveTransferSection extends StatelessWidget {
-  const _ActiveTransferSection({required this.transferAsync, required this.ref});
+  const _ActiveTransferSection(
+      {required this.transferAsync, required this.ref});
   final AsyncValue<TransferEntity> transferAsync;
   final WidgetRef ref;
 
@@ -195,7 +181,6 @@ class _TransferProgressCard extends StatelessWidget {
     required this.manager,
     required this.onStartNew,
   });
-
   final TransferEntity transfer;
   final TransferManager manager;
   final VoidCallback onStartNew;
@@ -203,7 +188,7 @@ class _TransferProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final pct = (transfer.progress * 100).clamp(0, 100);
+    final pct = (transfer.progress * 100).clamp(0.0, 100.0);
 
     return Card(
       child: Padding(
@@ -214,18 +199,20 @@ class _TransferProgressCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    transfer.fileName,
-                    style: Theme.of(context).textTheme.titleSmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  child: Text(transfer.fileName,
+                      style: Theme.of(context).textTheme.titleSmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                 ),
                 _StatusChip(status: transfer.status),
               ],
             ),
             const SizedBox(height: 16),
-            LinearProgressIndicator(value: transfer.progress),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                  value: transfer.progress, minHeight: 6),
+            ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -240,32 +227,17 @@ class _TransferProgressCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  transfer.status == TransferStatus.completed
-                      ? 'Completed'
-                      : transfer.retryCount > 0
-                          ? 'Retrying (${transfer.retryCount}) · '
-                              '${FileUtils.formatSpeed(transfer.speedBytesPerSec)}'
-                          : FileUtils.formatSpeed(transfer.speedBytesPerSec),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
-                ),
-                if (transfer.status == TransferStatus.completed &&
-                    transfer.remoteFileName != null)
-                  Flexible(
-                    child: Text(
-                      'Saved as ${transfer.remoteFileName}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: cs.primary,
-                          ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-              ],
+            Text(
+              transfer.status == TransferStatus.completed
+                  ? 'Completed'
+                  : transfer.retryCount > 0
+                      ? 'Retrying (${transfer.retryCount}) · '
+                          '${FileUtils.formatSpeed(transfer.speedBytesPerSec)}'
+                      : FileUtils.formatSpeed(transfer.speedBytesPerSec),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: cs.onSurfaceVariant),
             ),
             if (transfer.errorMessage != null) ...[
               const SizedBox(height: 12),
@@ -273,10 +245,9 @@ class _TransferProgressCard extends StatelessWidget {
             ],
             const SizedBox(height: 16),
             _ActionRow(
-              transfer: transfer,
-              manager: manager,
-              onStartNew: onStartNew,
-            ),
+                transfer: transfer,
+                manager: manager,
+                onStartNew: onStartNew),
           ],
         ),
       ),
@@ -290,50 +261,67 @@ class _ActionRow extends StatelessWidget {
     required this.manager,
     required this.onStartNew,
   });
-
   final TransferEntity transfer;
   final TransferManager manager;
   final VoidCallback onStartNew;
 
   @override
   Widget build(BuildContext context) {
-    final status = transfer.status;
-    final buttons = <Widget>[];
-
-    switch (status) {
-      case TransferStatus.preparing:
-      case TransferStatus.running:
-        buttons.add(_ActionButton(
-            icon: Icons.pause, label: 'Pause',
-            onTap: () => manager.pause(transfer.id)));
-        buttons.add(_ActionButton(
-            icon: Icons.cancel, label: 'Cancel', destructive: true,
-            onTap: () => _confirmCancel(context, manager.cancel, transfer.id)));
-      case TransferStatus.paused:
-        buttons.add(_ActionButton(
-            icon: Icons.play_arrow, label: 'Resume',
-            onTap: () => manager.resume(transfer.id)));
-        buttons.add(_ActionButton(
-            icon: Icons.cancel, label: 'Cancel', destructive: true,
-            onTap: () => _confirmCancel(context, manager.cancel, transfer.id)));
-      case TransferStatus.failed:
-      case TransferStatus.cancelled:
-        buttons.add(_ActionButton(
-            icon: Icons.refresh, label: 'Retry',
-            onTap: () => manager.retry(transfer.id)));
-        buttons.add(_ActionButton(
-            icon: Icons.delete_outline, label: 'Remove',
-            onTap: () { manager.removeCompleted(transfer.id); onStartNew(); }));
-      case TransferStatus.completed:
-        buttons.add(_ActionButton(
-            icon: Icons.add, label: 'New Upload', onTap: onStartNew));
-      case TransferStatus.queued:
-        buttons.add(_ActionButton(
-            icon: Icons.cancel, label: 'Cancel', destructive: true,
-            onTap: () => _confirmCancel(context, manager.cancel, transfer.id)));
-    }
-
-    return Wrap(spacing: 8, runSpacing: 8, children: buttons);
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: switch (transfer.status) {
+        TransferStatus.preparing || TransferStatus.running => [
+            _ActionButton(
+                icon: Icons.pause,
+                label: 'Pause',
+                onTap: () => manager.pause(transfer.id)),
+            _ActionButton(
+                icon: Icons.cancel,
+                label: 'Cancel',
+                destructive: true,
+                onTap: () =>
+                    _confirmCancel(context, manager.cancel, transfer.id)),
+          ],
+        TransferStatus.paused => [
+            _ActionButton(
+                icon: Icons.play_arrow,
+                label: 'Resume',
+                onTap: () => manager.resume(transfer.id)),
+            _ActionButton(
+                icon: Icons.cancel,
+                label: 'Cancel',
+                destructive: true,
+                onTap: () =>
+                    _confirmCancel(context, manager.cancel, transfer.id)),
+          ],
+        TransferStatus.failed || TransferStatus.cancelled => [
+            _ActionButton(
+                icon: Icons.refresh,
+                label: 'Retry',
+                onTap: () => manager.retry(transfer.id)),
+            _ActionButton(
+                icon: Icons.delete_outline,
+                label: 'Remove',
+                onTap: () {
+                  manager.removeCompleted(transfer.id);
+                  onStartNew();
+                }),
+          ],
+        TransferStatus.completed => [
+            _ActionButton(
+                icon: Icons.add, label: 'New Upload', onTap: onStartNew),
+          ],
+        TransferStatus.queued => [
+            _ActionButton(
+                icon: Icons.cancel,
+                label: 'Cancel',
+                destructive: true,
+                onTap: () =>
+                    _confirmCancel(context, manager.cancel, transfer.id)),
+          ],
+      },
+    );
   }
 }
 
@@ -344,7 +332,6 @@ class _ActionButton extends StatelessWidget {
     required this.onTap,
     this.destructive = false,
   });
-
   final IconData icon;
   final String label;
   final VoidCallback onTap;
@@ -363,42 +350,33 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// Status chip
-
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status});
   final TransferStatus status;
 
   @override
   Widget build(BuildContext context) {
-    final (label, color) = _statusInfo(status);
+    final (label, color) = switch (status) {
+      TransferStatus.queued    => ('Queued', Colors.grey),
+      TransferStatus.preparing => ('Preparing', Colors.blue),
+      TransferStatus.running   => ('Uploading', Colors.blue),
+      TransferStatus.paused    => ('Paused', Colors.amber),
+      TransferStatus.completed => ('Completed', Colors.green),
+      TransferStatus.failed    => ('Failed', Colors.red),
+      TransferStatus.cancelled => ('Cancelled', Colors.grey),
+    };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withAlpha(30),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        label,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600),
-      ),
+      child: Text(label,
+          style: TextStyle(
+              color: color, fontSize: 12, fontWeight: FontWeight.w600)),
     );
   }
-
-  (String, Color) _statusInfo(TransferStatus s) {
-    return switch (s) {
-      TransferStatus.queued => ('Queued', Colors.grey),
-      TransferStatus.preparing => ('Preparing', Colors.blue),
-      TransferStatus.running => ('Uploading', Colors.blue),
-      TransferStatus.paused => ('Paused', Colors.amber),
-      TransferStatus.completed => ('Completed', Colors.green),
-      TransferStatus.failed => ('Failed', Colors.red),
-      TransferStatus.cancelled => ('Cancelled', Colors.grey),
-    };
-  }
 }
-
-// Error banner
 
 class _ErrorBanner extends StatelessWidget {
   const _ErrorBanner({required this.message});
@@ -419,15 +397,14 @@ class _ErrorBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(message,
-                style: TextStyle(color: cs.onErrorContainer, fontSize: 13)),
+                style:
+                    TextStyle(color: cs.onErrorContainer, fontSize: 13)),
           ),
         ],
       ),
     );
   }
 }
-
-// Limitation note
 
 class _LimitationNote extends StatelessWidget {
   const _LimitationNote();
@@ -448,9 +425,9 @@ class _LimitationNote extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'The backend does not support resumable uploads. Pausing cancels '
-              'the request; resuming restarts the upload from the beginning. '
-              'Downloads, by contrast, resume from the last byte.',
+              'The backend does not support resumable uploads. '
+              'Pausing cancels the request; resuming restarts from the beginning. '
+              'Downloads resume from the last byte.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
@@ -459,8 +436,6 @@ class _LimitationNote extends StatelessWidget {
     );
   }
 }
-
-// Cancel confirmation dialog
 
 Future<void> _confirmCancel(
   BuildContext context,
@@ -471,10 +446,15 @@ Future<void> _confirmCancel(
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Cancel upload?'),
-      content: const Text('The upload will be stopped. You can retry it later.'),
+      content:
+          const Text('The upload will be stopped. You can retry it later.'),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Keep')),
-        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Cancel')),
+        TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Keep')),
+        FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Cancel')),
       ],
     ),
   );

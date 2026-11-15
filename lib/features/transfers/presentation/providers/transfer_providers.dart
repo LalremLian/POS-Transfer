@@ -10,11 +10,13 @@ import '../../domain/entities/transfer_entity.dart';
 import '../../domain/entities/transfer_manager.dart';
 import '../../domain/repositories/transfer_repository.dart';
 
+// ── Repository ──────────────────────────────────────────────────────────
+
 final transferRepositoryProvider = Provider<TransferRepository>((ref) {
   return TransferRepositoryImpl(ref.watch(localDatabaseServiceProvider));
 });
 
-// Manager (single, lifecycle-independent, NOT autoDispose)
+// ── Manager ─────────────────────────────────────────────────────────────
 
 final transferManagerProvider = Provider<TransferManager>((ref) {
   final manager = TransferManager(
@@ -22,6 +24,7 @@ final transferManagerProvider = Provider<TransferManager>((ref) {
     config: ref.watch(transferConfigProvider),
   );
 
+  // Wire upload executor.
   final uploadExecutor = UploadExecutor(
     repository: ref.watch(uploadRepositoryProvider),
     manager: manager,
@@ -29,7 +32,7 @@ final transferManagerProvider = Provider<TransferManager>((ref) {
   );
   manager.uploadExecutor = uploadExecutor.call;
 
-  // Wire download executor (Phase 5).
+  // Wire download executor.
   final downloadExecutor = DownloadExecutor(
     repository: ref.watch(downloadRepositoryProvider),
     manager: manager,
@@ -38,59 +41,46 @@ final transferManagerProvider = Provider<TransferManager>((ref) {
   manager.downloadExecutor = downloadExecutor.call;
 
   ref.onDispose(manager.dispose);
-  // Restore persisted state once on creation. Runs async; streams populate
-  // the UI when it completes. This keeps the manager decoupled from main.dart.
   manager.restore();
   return manager;
 });
 
-// Per-transfer isolated stream
+// ── Per-transfer isolated stream (3.6) ─────────────────────────────────
 
 final transferProvider =
     StreamProvider.family<TransferEntity, String>((ref, id) {
-  final manager = ref.watch(transferManagerProvider);
-  return manager.watch(id);
+  return ref.watch(transferManagerProvider).watch(id);
 });
 
-// Global roster
-//
-// Emits the full list but ONLY on structural / status changes — never on
-// progress ticks. The dashboard watches this to build the list + counts
-// without rebuilding on every progress callback.
+// ── Global roster (3.7) ─────────────────────────────────────────────────
 
 final transferRosterProvider = StreamProvider<List<TransferEntity>>((ref) {
-  final manager = ref.watch(transferManagerProvider);
-  return manager.watchAll();
+  return ref.watch(transferManagerProvider).watchAll();
 });
 
-// Derived lists / counts (read from roster → rebuild on status change only)
+// ── Derived counts ───────────────────────────────────────────────────────
 
 final activeTransfersProvider = Provider<List<TransferEntity>>((ref) {
-  final roster = ref.watch(transferRosterProvider).valueOrNull ?? const [];
-  return roster.where((t) => t.isActive).toList();
-});
-
-final queuedTransfersProvider = Provider<List<TransferEntity>>((ref) {
-  final roster = ref.watch(transferRosterProvider).valueOrNull ?? const [];
-  return roster.where((t) => t.status == TransferStatus.queued).toList();
+  return (ref.watch(transferRosterProvider).valueOrNull ?? [])
+      .where((t) => t.isActive)
+      .toList();
 });
 
 final completedTransfersProvider = Provider<List<TransferEntity>>((ref) {
-  final roster = ref.watch(transferRosterProvider).valueOrNull ?? const [];
-  return roster
+  return (ref.watch(transferRosterProvider).valueOrNull ?? [])
       .where((t) => t.status == TransferStatus.completed)
       .toList();
 });
 
 final failedTransfersProvider = Provider<List<TransferEntity>>((ref) {
-  final roster = ref.watch(transferRosterProvider).valueOrNull ?? const [];
-  return roster.where((t) => t.status == TransferStatus.failed).toList();
+  return (ref.watch(transferRosterProvider).valueOrNull ?? [])
+      .where((t) => t.status == TransferStatus.failed)
+      .toList();
 });
 
-/// Aggregate counts for the dashboard header.
 final transferCountsProvider = Provider<TransferCounts>((ref) {
-  final roster = ref.watch(transferRosterProvider).valueOrNull ?? const [];
-  return TransferCounts.from(roster);
+  return TransferCounts.from(
+      ref.watch(transferRosterProvider).valueOrNull ?? []);
 });
 
 class TransferCounts {
@@ -103,12 +93,7 @@ class TransferCounts {
     required this.total,
   });
 
-  final int active;
-  final int queued;
-  final int paused;
-  final int completed;
-  final int failed;
-  final int total;
+  final int active, queued, paused, completed, failed, total;
 
   factory TransferCounts.from(List<TransferEntity> roster) {
     var active = 0, queued = 0, paused = 0, completed = 0, failed = 0;
@@ -117,21 +102,16 @@ class TransferCounts {
         case TransferStatus.queued:
           queued++;
           active++;
-          break;
         case TransferStatus.preparing:
         case TransferStatus.running:
           active++;
-          break;
         case TransferStatus.paused:
           paused++;
           active++;
-          break;
         case TransferStatus.completed:
           completed++;
-          break;
         case TransferStatus.failed:
           failed++;
-          break;
         case TransferStatus.cancelled:
           break;
       }
@@ -146,3 +126,13 @@ class TransferCounts {
     );
   }
 }
+
+// ── Phase 9: Connectivity status provider ────────────────────────────────
+//
+// Widgets watch this for the offline banner. TransferServiceObserver
+// also watches it to pause/resume transfers on connectivity changes.
+
+final connectivityStatusProvider = StateProvider<bool>((ref) {
+  // Initial value — updated by ConnectivityObserver widget.
+  return true;
+});
