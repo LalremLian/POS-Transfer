@@ -110,7 +110,7 @@ class NotificationService {
     await android?.createNotificationChannel(serviceChannel);
   }
 
-  // ── Upload ────────────────────────────────────────────────────────────
+  // Upload
 
   void notifyUploadStarted(String id, String fileName) {
     _show(
@@ -167,7 +167,7 @@ class NotificationService {
     );
   }
 
-  // ── Download ──────────────────────────────────────────────────────────
+  // Download
 
   void notifyDownloadStarted(String id, String fileName) {
     _show(
@@ -229,7 +229,12 @@ class NotificationService {
     _plugin.cancel(_notifId(transferId));
   }
 
-  // ── Internal ──────────────────────────────────────────────────────────
+  Future<void> cancelAll() async {
+    _lastProgressNotif.clear();
+    await _plugin.cancelAll();
+  }
+
+  // Internal
 
   bool _isThrottled(String id, TransferConfig config) {
     final now = DateTime.now();

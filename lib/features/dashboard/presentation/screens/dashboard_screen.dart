@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/app_router.dart';
 import '../../../authentication/presentation/providers/auth_provider.dart';
-import '../../../transfers/domain/entities/transfer_entity.dart';
 import '../../../transfers/presentation/providers/transfer_providers.dart';
 import '../widgets/dashboard_screen_widget.dart';
 
@@ -80,32 +79,38 @@ class DashboardScreen extends ConsumerWidget {
                         )),
                 const SizedBox(height: 20),
 
-                // Stat chips
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    StatChip(
-                        icon: Icons.sync,
-                        label: 'Active',
-                        value: counts.active,
-                        color: cs.primary),
-                    StatChip(
-                        icon: Icons.queue,
-                        label: 'Queued',
-                        value: counts.queued,
-                        color: cs.tertiary),
-                    StatChip(
-                        icon: Icons.check_circle_outline,
-                        label: 'Done',
-                        value: counts.completed,
-                        color: Colors.green),
-                    StatChip(
-                        icon: Icons.error_outline,
-                        label: 'Failed',
-                        value: counts.failed,
-                        color: cs.error),
-                  ],
+                // Responsive Stat chips
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final crossAxisCount = constraints.maxWidth >= 600 ? 4 : 2;
+                    final items = [
+                      (Icons.sync, 'Active', counts.active, cs.primary),
+                      (Icons.queue, 'Queued', counts.queued, cs.tertiary),
+                      (Icons.check_circle_outline, 'Done', counts.completed, Colors.green),
+                      (Icons.error_outline, 'Failed', counts.failed, cs.error),
+                    ];
+
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        mainAxisExtent: 48,
+                      ),
+                      itemBuilder: (context, index) {
+                        final (icon, label, val, color) = items[index];
+                        return StatChip(
+                          icon: icon,
+                          label: label,
+                          value: val,
+                          color: color,
+                        );
+                      },
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
 
@@ -134,17 +139,9 @@ class DashboardScreen extends ConsumerWidget {
                   data: (roster) {
                     if (roster.isEmpty) return const EmptyState();
 
-                    // Active + paused at the top, then completed, then cancelled.
+                    // Active transfers at the top.
                     final active =
                         roster.where((t) => t.isActive).toList();
-                    final done = roster
-                        .where((t) => t.status == TransferStatus.completed)
-                        .toList();
-                    final failed = roster
-                        .where((t) =>
-                            t.status == TransferStatus.failed ||
-                            t.status == TransferStatus.cancelled)
-                        .toList();
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,19 +150,6 @@ class DashboardScreen extends ConsumerWidget {
                           SectionLabel('Active (${active.length})'),
                           const SizedBox(height: 8),
                           TransferList(ids: active.map((t) => t.id).toList()),
-                          const SizedBox(height: 20),
-                        ],
-                        if (done.isNotEmpty) ...[
-                          SectionLabel('Completed (${done.length})'),
-                          const SizedBox(height: 8),
-                          TransferList(ids: done.map((t) => t.id).toList()),
-                          const SizedBox(height: 20),
-                        ],
-                        if (failed.isNotEmpty) ...[
-                          SectionLabel('Failed / Cancelled (${failed.length})'),
-                          const SizedBox(height: 8),
-                          TransferList(
-                              ids: failed.map((t) => t.id).toList()),
                           const SizedBox(height: 20),
                         ],
                         TextButton.icon(

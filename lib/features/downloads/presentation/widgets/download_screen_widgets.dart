@@ -8,7 +8,6 @@ import '../../../transfers/domain/entities/transfer_manager.dart';
 import '../../../transfers/presentation/providers/transfer_providers.dart';
 import '../../domain/entities/remote_file.dart';
 import '../providers/download_providers.dart';
-// ── Remote file card ─────────────────────────────────────────────────────
 
 class RemoteFileCard extends ConsumerWidget {
   const RemoteFileCard({required this.file});
@@ -105,7 +104,7 @@ class _DownloadButton extends ConsumerWidget {
   }
 }
 
-// ── Active transfer progress ──────────────────────────────────────────────
+// Active transfer progress
 
 class _ActiveTransferRow extends ConsumerWidget {
   const _ActiveTransferRow({required this.transferId});
@@ -234,7 +233,7 @@ class _Btn extends StatelessWidget {
   }
 }
 
-// ── Status chip ───────────────────────────────────────────────────────────
+// Status chip
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status});

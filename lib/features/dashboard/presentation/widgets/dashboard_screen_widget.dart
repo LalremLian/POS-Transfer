@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../transfers/presentation/widgets/transfer_card.dart';
+
 class TransferList extends StatelessWidget {
-  const TransferList({required this.ids});
+  const TransferList({super.key, required this.ids});
   final List<String> ids;
 
   @override
@@ -19,7 +19,7 @@ class TransferList extends StatelessWidget {
 }
 
 class SectionLabel extends StatelessWidget {
-  const SectionLabel(this.text);
+  const SectionLabel(this.text, {super.key});
   final String text;
 
   @override
@@ -34,6 +34,7 @@ class SectionLabel extends StatelessWidget {
 
 class StatChip extends StatelessWidget {
   const StatChip({
+    super.key,
     required this.icon,
     required this.label,
     required this.value,
@@ -47,26 +48,36 @@ class StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: color.withAlpha(20),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color.withAlpha(60)),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: color, size: 18),
           const SizedBox(width: 6),
-          Text('$value',
-              style: TextStyle(
-                  color: color, fontWeight: FontWeight.w700, fontSize: 16)),
+          Text(
+            '$value',
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+            ),
+          ),
           const SizedBox(width: 4),
-          Text(label,
+          Flexible(
+            child: Text(
+              label,
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
-                  ?.copyWith(color: color)),
+                  ?.copyWith(color: color),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -74,7 +85,7 @@ class StatChip extends StatelessWidget {
 }
 
 class EmptyState extends StatelessWidget {
-  const EmptyState();
+  const EmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +111,7 @@ class EmptyState extends StatelessWidget {
 }
 
 class ErrorState extends StatelessWidget {
-  const ErrorState({required this.message});
+  const ErrorState({super.key, required this.message});
   final String message;
 
   @override

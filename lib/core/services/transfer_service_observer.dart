@@ -169,9 +169,14 @@ class _TransferServiceObserverState
       });
     }
 
-    // Clean up tracking for removed transfers.
+    // Clean up tracking & cancel notifications for removed transfers.
     final allIds = roster.map((t) => t.id).toSet();
-    _lastStatus.removeWhere((id, _) => !allIds.contains(id));
+    final removedIds =
+        _lastStatus.keys.where((id) => !allIds.contains(id)).toList();
+    for (final id in removedIds) {
+      _lastStatus.remove(id);
+      _notif.cancel(id);
+    }
     _autoPausedIds.removeWhere((id) => !allIds.contains(id));
   }
 

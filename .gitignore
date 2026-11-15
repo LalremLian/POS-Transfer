@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Signing keys — never commit
+*.jks
+*.keystore
+*.p12
+
+# Secrets / environment files — never commit
+.env
+.env.*
+secrets.dart
+secrets/

@@ -189,14 +189,17 @@ class _Btn extends StatelessWidget {
     final color = danger
         ? Theme.of(context).colorScheme.error
         : Theme.of(context).colorScheme.primary;
-    return OutlinedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, size: 16, color: color),
-      label: Text(label, style: TextStyle(color: color, fontSize: 12)),
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(0, 30),
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        side: BorderSide(color: color.withAlpha(80)),
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: OutlinedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 16, color: color),
+        label: Text(label, style: TextStyle(color: color, fontSize: 12)),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(0, 30),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          side: BorderSide(color: color.withAlpha(80)),
+        ),
       ),
     );
   }
