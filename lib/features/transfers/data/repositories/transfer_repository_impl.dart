@@ -2,9 +2,6 @@ import '../../../../core/services/local_database_service.dart';
 import '../../domain/entities/transfer_entity.dart';
 import '../../domain/repositories/transfer_repository.dart';
 
-/// SharedPreferences-backed implementation
-/// Transfers are stored as a JSON list under one key (see LocalDatabaseService).
-/// For dozens of transfers this is fine; swap to drift/sqflite if scale demands.
 class TransferRepositoryImpl implements TransferRepository {
   TransferRepositoryImpl(this._db);
 
@@ -39,8 +36,7 @@ class TransferRepositoryImpl implements TransferRepository {
     await _db.saveAllTransfers(all);
   }
 
-  /// Removes completed + cancelled entries. Keeps failed ones so the user
-  /// can still retry them.
+  /// Removes completed + cancelled entries. Keeps failed ones so the user can still retry them.
   @override
   Future<void> clearTerminal() async {
     final all = _db.loadAllTransfers()

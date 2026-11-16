@@ -19,9 +19,6 @@ class _PosTransferAppState extends ConsumerState<PosTransferApp> {
   @override
   void initState() {
     super.initState();
-    // Wire the notification tap callback once the first frame is built.
-    // We do this once — the router instance is stable; auth redirects happen
-    // inside GoRouter, not by replacing the router.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _wireNotificationCallback();
     });

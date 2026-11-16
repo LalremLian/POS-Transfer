@@ -9,10 +9,6 @@ import '../../app/di/providers.dart';
 import 'background_transfer_service.dart';
 import 'notification_service.dart';
 
-/// Invisible widget at the app root that:
-/// - Starts/stops the Android foreground service (Phase 6)
-/// - Fires lifecycle + progress notifications (Phase 7)
-/// - Monitors connectivity and pauses/resumes transfers (Phase 9)
 class TransferServiceObserver extends ConsumerStatefulWidget {
   const TransferServiceObserver({super.key, required this.child});
   final Widget child;
@@ -30,7 +26,7 @@ class _TransferServiceObserverState
   final Map<String, TransferStatus> _lastStatus = {};
   final Map<String, StreamSubscription<TransferEntity>> _progressSubs = {};
 
-  // Phase 9 — connectivity
+  // connectivity
   StreamSubscription<bool>? _connectivitySub;
   bool _wasOnline = true;
 
@@ -49,8 +45,7 @@ class _TransferServiceObserverState
     super.dispose();
   }
 
-  // ── Phase 9: Connectivity ─────────────────────────────────────────────
-
+  // Connectivity
   void _startConnectivityMonitoring() {
     final networkInfo = ref.read(networkInfoProvider);
 
@@ -67,10 +62,10 @@ class _TransferServiceObserverState
       ref.read(connectivityStatusProvider.notifier).state = online;
 
       if (!online && _wasOnline) {
-        // 9.1 — Went offline: pause all running transfers.
+        // Went offline: pause all running transfers.
         _onWentOffline();
       } else if (online && !_wasOnline) {
-        // 9.2 — Back online: resume paused transfers that were auto-paused.
+        // Back online: resume paused transfers that were auto-paused.
         _onBackOnline();
       }
       _wasOnline = online;
@@ -102,8 +97,7 @@ class _TransferServiceObserverState
   // Track which transfers were auto-paused by connectivity loss.
   final Set<String> _autoPausedIds = {};
 
-  // ── Roster changes ────────────────────────────────────────────────────
-
+  // Roster changes
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<List<TransferEntity>>>(
@@ -119,7 +113,7 @@ class _TransferServiceObserverState
   void _onRosterChanged(List<TransferEntity> roster) {
     final active = roster.where((t) => t.isActive).toList();
 
-    // Phase 6.3/6.4 — Start/stop foreground service.
+    // Start/stop foreground service.
     if (active.isNotEmpty) {
       final first = active.firstWhere(
         (t) => t.status == TransferStatus.running,
@@ -143,7 +137,7 @@ class _TransferServiceObserverState
       }
     }
 
-    // Phase 7.4 — Progress subscriptions for running transfers.
+    // Progress subscriptions for running transfers.
     final runningIds = active
         .where((t) => t.status == TransferStatus.running)
         .map((t) => t.id)
@@ -180,7 +174,7 @@ class _TransferServiceObserverState
     _autoPausedIds.removeWhere((id) => !allIds.contains(id));
   }
 
-  // Phase 7.5 — Lifecycle notifications fire immediately (no throttle).
+  // Lifecycle notifications fire immediately (no throttle).
   void _fireLifecycleNotification(TransferEntity t, TransferStatus? prev) {
     final isUpload = t.type == TransferType.upload;
     switch (t.status) {

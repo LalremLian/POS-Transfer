@@ -50,7 +50,6 @@ class LocalDatabaseService {
   }
 
   // Settings
-
   Future<void> saveSetting(String key, String value) async {
     try {
       await _prefs.setString('setting_$key', value);

@@ -1,8 +1,3 @@
-/// Calculates transfer speed from actual transferred bytes and elapsed time.
-///
-/// Samples at a configurable interval (default 1s), smooths the value so the
-/// UI doesn't jitter, holds the last speed across zero-byte intervals, and
-/// resets cleanly when an upload restarts or a download resumes.
 class SpeedTracker {
   SpeedTracker({this.sampleIntervalMs = 1000});
 

@@ -7,8 +7,6 @@ import '../constants/api_constants.dart';
 import '../transfer/transfer_config.dart';
 import 'auth_interceptor.dart';
 
-/// Factory that builds a configured [Dio] instance.
-/// Each call returns a fresh instance; share via Riverpod provider.
 Dio createDioClient({
   required AuthInterceptor authInterceptor,
   TransferConfig config = transferConfig,

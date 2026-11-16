@@ -42,12 +42,12 @@ class TransferManager {
   TransferExecutor? uploadExecutor;
   TransferExecutor? downloadExecutor;
 
-  // Cancel hooks (Phase 4/5) — lets pause/cancel abort an in-flight request
+  // Cancel hooks — lets pause/cancel abort an in-flight request
   final Map<String, void Function()> _cancelCallbacks = {};
 
   // Streams the UI subscribes to
 
-  /// Isolated stream for a single transfer (3.6). Yields the current value first,
+  /// Isolated stream for a single transfer. Yields the current value first,
   /// then every throttled update for THIS transfer only.
   Stream<TransferEntity> watch(String id) async* {
     final current = _transfers[id];
@@ -55,7 +55,7 @@ class TransferManager {
     yield* _ensureController(id).stream;
   }
 
-  /// Global list stream (3.7). Emits only on structural / status changes, never
+  /// Global list stream. Emits only on structural / status changes, never
   /// on progress ticks, so the dashboard doesn't rebuild per-progress.
   Stream<List<TransferEntity>> watchAll() async* {
     yield _snapshot();
@@ -63,7 +63,6 @@ class TransferManager {
   }
 
   // Queries
-
   TransferEntity? get(String id) => _transfers[id];
   List<TransferEntity> get all => _snapshot();
   List<TransferEntity> get active =>
@@ -80,7 +79,6 @@ class TransferManager {
   }
 
   // Restore on startup
-
   Future<void> restore() async {
     final persisted = _repo.loadAll();
     for (final t in persisted) {
@@ -116,9 +114,8 @@ class TransferManager {
   }
 
   // Enqueue (public API for the upload/download features)
-
   /// Enqueue an upload. Returns the transfer. If an active transfer for the same
-  /// local file already exists, returns that one (duplicate prevention, 3.8).
+  /// local file already exists, returns that one (duplicate prevention).
   TransferEntity enqueueUpload({
     required String localFilePath,
     required String fileName,
@@ -231,8 +228,7 @@ class TransferManager {
       final executor = transfer.type == TransferType.upload
           ? uploadExecutor
           : downloadExecutor;
-      // No executor registered yet (Phase 3) → leave it queued. Nothing runs
-      // and no progress is faked. Phase 4/5 assigns the executors.
+      // No executor registered yet → leave it queued. Nothing runs and no progress is faked.
       if (executor == null) break;
       _queue.occupyNext();
       _setStatus(id, TransferStatus.preparing);
@@ -259,11 +255,6 @@ class TransferManager {
   }
 
   // Actions
-
-  /// Pause a running transfer (cancels the in-flight request via the hook,
-  /// keeps the partial file/metadata). Queued transfers are removed from the
-  /// pending list. Resume restarts uploads from zero (backend has no resumable
-  /// upload); downloads resume from the last byte.
   Future<void> pause(String id) async {
     final t = _transfers[id];
     if (t == null) return;
@@ -359,10 +350,6 @@ class TransferManager {
   }
 
   // Progress reporting
-
-  /// Update progress for a running transfer. Throttles UI emission (500 ms)
-  /// and persistence (5 s) so frequent Dio callbacks don't flood Riverpod or
-  /// the database. Status changes always emit immediately (use _setStatus).
   void updateProgress(
     String id, {
     required int transferredBytes,
@@ -390,7 +377,6 @@ class TransferManager {
   }
 
   // Public state mutators
-
   /// Mark a transfer as actively running (preparing → running).
   void markRunning(String id) {
     final t = _transfers[id];
@@ -478,7 +464,6 @@ class TransferManager {
   }
 
   // Internal state mutators
-
   void _setStatus(String id, TransferStatus status, {String? errorMessage}) {
     final t = _transfers[id];
     if (t == null) return;
@@ -523,7 +508,6 @@ class TransferManager {
   }
 
   // Stream emission
-
   StreamController<TransferEntity> _ensureController(String id) {
     return _controllers.putIfAbsent(
       id,
@@ -542,7 +526,6 @@ class TransferManager {
   }
 
   // Cancel hook registration
-
   void registerCancelCallback(String id, void Function() cancel) =>
       _cancelCallbacks[id] = cancel;
 

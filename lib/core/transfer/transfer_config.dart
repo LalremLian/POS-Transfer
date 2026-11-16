@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Centralized, immutable configuration for all transfer behaviour.
-/// Change a value here to affect the entire engine — no magic numbers elsewhere.
 @immutable
 class TransferConfig {
   const TransferConfig({
@@ -24,11 +22,11 @@ class TransferConfig {
     this.uploadChunkSize = 0, // 0 = not used (single multipart request)
   });
 
-  // ── Concurrency ───────────────────────────────────────────────────────────
+  // Concurrency
   /// Maximum number of transfers (upload + download combined) running at once.
   final int maxConcurrentTransfers;
 
-  // ── Retry & backoff ───────────────────────────────────────────────────────
+  // Retry & backoff
   final int maxRetryAttempts;
   final int initialRetryDelayMs;
   final int maxRetryDelayMs;
@@ -36,12 +34,12 @@ class TransferConfig {
   /// Fraction of calculated delay added as random jitter (0–1).
   final double jitterFactor;
 
-  // ── Timeouts ──────────────────────────────────────────────────────────────
+  // Timeouts
   final int connectionTimeoutMs;
   final int sendTimeoutMs;
   final int receiveTimeoutMs;
 
-  // ── UI / notification throttling ──────────────────────────────────────────
+  // UI / notification throttling
   /// Minimum ms between state emissions for a single transfer's progress.
   final int uiProgressIntervalMs;
 
@@ -51,7 +49,7 @@ class TransferConfig {
   /// Minimum ms between metadata persistence writes during transfers.
   final int metadataPersistIntervalMs;
 
-  // ── File I/O ──────────────────────────────────────────────────────────────
+  // File I/O
   /// Bytes read per streaming chunk when writing download data to disk.
   final int downloadStreamChunkSize;
 
@@ -61,10 +59,10 @@ class TransferConfig {
   /// Extra free-space buffer required beyond the file size.
   final int storageCheckPaddingBytes;
 
-  // ── Speed calculation ─────────────────────────────────────────────────────
+  // Speed calculation
   final int speedSampleIntervalMs;
 
-  // ── Future: chunked uploads (backend not yet supported) ───────────────────
+  // Future: chunked uploads (backend not yet supported)
   /// Chunk size for future resumable uploads.  0 = feature not active.
   final int uploadChunkSize;
 
@@ -119,5 +117,4 @@ class TransferConfig {
 }
 
 /// The app-wide singleton configuration instance.
-/// Replace with a user-editable settings source in the future.
 const transferConfig = TransferConfig();

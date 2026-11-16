@@ -18,8 +18,7 @@ class BackgroundTransferService {
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: AppConstants.serviceChannelId,
         channelName: AppConstants.serviceChannelName,
-        channelDescription:
-            'Shown while file transfers are running in the background',
+        channelDescription: 'Shown while file transfers are running in the background',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         onlyAlertOnce: true,

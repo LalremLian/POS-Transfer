@@ -1,10 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 abstract class NetworkInfo {
-  // Whether any non-none connectivity is currently reported.
   Future<bool> get isConnected;
-
-  // Stream of connectivity changes. Emits `true` when going online.
   Stream<bool> get onConnectivityChanged;
 }
 

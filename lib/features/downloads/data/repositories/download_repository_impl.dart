@@ -43,7 +43,6 @@ class DownloadRepositoryImpl implements DownloadRepository {
   }
 
   // Stream download
-
   @override
   Future<DownloadStreamResult> streamFile({
     required String fileName,

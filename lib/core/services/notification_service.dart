@@ -11,7 +11,6 @@ const _payloadDownload = 'download';
 
 typedef NotificationTapCallback = void Function(String route);
 
-/// Centralized notification service — flutter_local_notifications.
 class NotificationService {
   NotificationService._();
   static final NotificationService instance = NotificationService._();
@@ -111,7 +110,6 @@ class NotificationService {
   }
 
   // Upload
-
   void notifyUploadStarted(String id, String fileName) {
     _show(
       id: _notifId(id),
@@ -168,7 +166,6 @@ class NotificationService {
   }
 
   // Download
-
   void notifyDownloadStarted(String id, String fileName) {
     _show(
       id: _notifId(id),
@@ -235,7 +232,6 @@ class NotificationService {
   }
 
   // Internal
-
   bool _isThrottled(String id, TransferConfig config) {
     final now = DateTime.now();
     final last = _lastProgressNotif[id];

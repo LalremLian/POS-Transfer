@@ -11,14 +11,11 @@ import '../../data/repositories/download_repository_impl.dart';
 import '../../domain/entities/remote_file.dart';
 import '../../domain/repositories/download_repository.dart';
 
-// Repository
-
 final downloadRepositoryProvider = Provider<DownloadRepository>((ref) {
   return DownloadRepositoryImpl(ref.watch(dioProvider));
 });
 
 // Remote file list
-
 final remoteFilesProvider = AsyncNotifierProvider<RemoteFilesNotifier, List<RemoteFile>>(
   RemoteFilesNotifier.new,
 );
@@ -43,7 +40,6 @@ class RemoteFilesNotifier extends AsyncNotifier<List<RemoteFile>> {
 }
 
 // Download screen state
-
 class DownloadNotifier extends Notifier<DownloadScreenState> {
   @override
   DownloadScreenState build() => const DownloadScreenState();

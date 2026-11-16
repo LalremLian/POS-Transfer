@@ -10,14 +10,11 @@ import '../../domain/entities/transfer_entity.dart';
 import '../../domain/entities/transfer_manager.dart';
 import '../../domain/repositories/transfer_repository.dart';
 
-// ── Repository ──────────────────────────────────────────────────────────
-
 final transferRepositoryProvider = Provider<TransferRepository>((ref) {
   return TransferRepositoryImpl(ref.watch(localDatabaseServiceProvider));
 });
 
-// ── Manager ─────────────────────────────────────────────────────────────
-
+// Manager
 final transferManagerProvider = Provider<TransferManager>((ref) {
   final manager = TransferManager(
     repository: ref.watch(transferRepositoryProvider),
@@ -45,21 +42,18 @@ final transferManagerProvider = Provider<TransferManager>((ref) {
   return manager;
 });
 
-// ── Per-transfer isolated stream (3.6) ─────────────────────────────────
-
+// Per-transfer isolated stream
 final transferProvider =
     StreamProvider.family<TransferEntity, String>((ref, id) {
   return ref.watch(transferManagerProvider).watch(id);
 });
 
-// ── Global roster (3.7) ─────────────────────────────────────────────────
-
+// Global roster
 final transferRosterProvider = StreamProvider<List<TransferEntity>>((ref) {
   return ref.watch(transferManagerProvider).watchAll();
 });
 
-// ── Derived counts ───────────────────────────────────────────────────────
-
+// Derived counts
 final activeTransfersProvider = Provider<List<TransferEntity>>((ref) {
   return (ref.watch(transferRosterProvider).valueOrNull ?? [])
       .where((t) => t.isActive)
@@ -127,12 +121,7 @@ class TransferCounts {
   }
 }
 
-// ── Phase 9: Connectivity status provider ────────────────────────────────
-//
-// Widgets watch this for the offline banner. TransferServiceObserver
-// also watches it to pause/resume transfers on connectivity changes.
-
+// Connectivity status provider
 final connectivityStatusProvider = StateProvider<bool>((ref) {
-  // Initial value — updated by ConnectivityObserver widget.
   return true;
 });

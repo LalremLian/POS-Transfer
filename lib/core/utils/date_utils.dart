@@ -1,6 +1,5 @@
 import 'package:intl/intl.dart';
 
-/// Date / time formatting utilities.
 abstract class AppDateUtils {
   AppDateUtils._();
 

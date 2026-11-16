@@ -13,7 +13,6 @@ final uploadRepositoryProvider = Provider<UploadRepository>((ref) {
 });
 
 // Upload screen state
-
 class UploadSelection {
   const UploadSelection({
     this.filePath,

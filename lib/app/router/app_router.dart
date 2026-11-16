@@ -13,22 +13,22 @@ import '../../features/transfers/presentation/screens/transfer_history_screen.da
 import '../../features/uploads/presentation/screens/upload_screen.dart';
 
 abstract class Routes {
-  static const splash         = '/splash';
-  static const login          = '/login';
-  static const dashboard      = '/dashboard';
-  static const upload         = '/upload';
-  static const download       = '/download';
-  static const history        = '/history';
+  static const splash = '/splash';
+  static const login = '/login';
+  static const dashboard = '/dashboard';
+  static const upload = '/upload';
+  static const download = '/download';
+  static const history = '/history';
   static const transferDetail = '/transfers/:id';
 
   static String detailPath(String id) => '/transfers/$id';
 
   static String payloadToRoute(String payload) {
     return switch (payload) {
-      'upload'   => upload,
+      'upload' => upload,
       'download' => download,
-      'history'  => history,
-      _          => payload.startsWith('/') ? payload : dashboard,
+      'history' => history,
+      _ => payload.startsWith('/') ? payload : dashboard,
     };
   }
 }
@@ -124,10 +124,10 @@ class _AppShell extends ConsumerWidget {
   final Widget child;
 
   static const _tabs = [
-    (icon: Icons.dashboard_outlined,          label: 'Dashboard', path: Routes.dashboard),
-    (icon: Icons.upload_file_outlined,         label: 'Upload',    path: Routes.upload),
-    (icon: Icons.download_for_offline_outlined,label: 'Download',  path: Routes.download),
-    (icon: Icons.history_outlined,             label: 'History',   path: Routes.history),
+    (icon: Icons.dashboard_outlined, label: 'Dashboard', path: Routes.dashboard),
+    (icon: Icons.upload_file_outlined, label: 'Upload',    path: Routes.upload),
+    (icon: Icons.download_for_offline_outlined, label: 'Download',  path: Routes.download),
+    (icon: Icons.history_outlined, label: 'History',   path: Routes.history),
   ];
 
   @override

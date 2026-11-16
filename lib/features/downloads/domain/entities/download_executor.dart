@@ -17,8 +17,7 @@ import '../repositories/download_repository.dart';
 
 final _log = Logger();
 
-/// Executes a resumable download with bounded retry, SHA-256, and atomic
-/// finalization. All 11 Phase 5 requirements are implemented here.
+/// Executes a resumable download with bounded retry, SHA-256, and atomic finalization.
 class DownloadExecutor {
   DownloadExecutor({
     required DownloadRepository repository,
@@ -58,18 +57,18 @@ class DownloadExecutor {
         _manager.markRunning(transfer.id);
         speed.reset();
 
-        // 5.9 — Storage check (best-effort log; real check needs platform channel)
+        // Storage check (best-effort log; real check needs platform channel)
         if (transfer.totalBytes > _config.largeFileSizeThreshold) {
           _log.d('Large download ${transfer.totalBytes} B — no native storage check');
         }
 
-        // 5.4 — Resume offset: read existing .part file size.
+        // Resume offset: read existing .part file size.
         // Ensure the destination directory exists before any file operation.
         final partFile = File(partPath);
         await partFile.parent.create(recursive: true);
         final startBytes = partFile.existsSync() ? partFile.lengthSync() : 0;
 
-        // 5.3 + 5.5 — Stream to .part file, send Range header if resuming
+        // Stream to .part file, send Range header if resuming
         final streamResult = await _repo.streamFile(
           fileName: transfer.remoteFileName!,
           destinationPartPath: partPath,
@@ -89,7 +88,7 @@ class DownloadExecutor {
 
         if (_isStopped(transfer.id)) return;
 
-        // 5.6 + 5.7 + 5.8 — Verify, SHA-256, atomic rename
+        // Verify, SHA-256, atomic rename
         await _finalize(transfer, partPath, streamResult.totalBytes);
         return; // success
 
@@ -107,7 +106,7 @@ class DownloadExecutor {
     }
   }
 
-  // ── Finalization ────────────────────────────────────────────────────────
+  // Finalization
 
   Future<void> _finalize(
     TransferEntity transfer,
@@ -135,15 +134,15 @@ class DownloadExecutor {
       speedBytesPerSec: 0,
     );
 
-    // 5.7 — Streaming SHA-256 (never loads whole file into memory)
+    // Streaming SHA-256 (never loads whole file into memory)
     final checksum = await _computeSha256(partFile);
 
-    // 5.8 — Collision-safe destination filename
+    // Collision-safe destination filename
     final destDir = p.dirname(transfer.destinationPath!);
     final fileName = p.basename(transfer.destinationPath!);
     final safeDest = await FileUtils.resolveCollision(destDir, fileName);
 
-    // 5.6 — Atomic rename: .part → final file
+    // Atomic rename: .part → final file
     await partFile.rename(safeDest);
 
     _manager.markCompleted(
@@ -168,8 +167,7 @@ class DownloadExecutor {
     return digest!.toString();
   }
 
-  // ── Helpers ─────────────────────────────────────────────────────────────
-
+  // Helpers
   bool _isStopped(String id) {
     final st = _manager.get(id)?.status;
     return st == TransferStatus.paused || st == TransferStatus.cancelled;
