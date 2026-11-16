@@ -24,7 +24,6 @@ abstract class AppTheme {
       useMaterial3: true,
       colorScheme: scheme,
 
-      // Typography
       textTheme: const TextTheme(
         displaySmall: TextStyle(fontWeight: FontWeight.w700),
         headlineMedium: TextStyle(fontWeight: FontWeight.w600),
@@ -34,7 +33,6 @@ abstract class AppTheme {
         labelLarge: TextStyle(fontWeight: FontWeight.w600),
       ),
 
-      // AppBar
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -48,7 +46,6 @@ abstract class AppTheme {
         ),
       ),
 
-      // Cards
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -58,7 +55,6 @@ abstract class AppTheme {
         margin: EdgeInsets.zero,
       ),
 
-      // Buttons
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(double.infinity, 48),
@@ -81,7 +77,6 @@ abstract class AppTheme {
         ),
       ),
 
-      // Inputs
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: scheme.surfaceContainerHighest.withAlpha(80),
@@ -112,7 +107,6 @@ abstract class AppTheme {
         circularTrackColor: scheme.surfaceContainerHighest,
       ),
 
-      // Bottom navigation
       navigationBarTheme: NavigationBarThemeData(
         elevation: 2,
         height: 64,
@@ -121,14 +115,12 @@ abstract class AppTheme {
         ),
       ),
 
-      // Chips
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
       ),
 
-      // Dividers
       dividerTheme: DividerThemeData(
         space: 1,
         thickness: 1,
@@ -138,7 +130,6 @@ abstract class AppTheme {
   }
 }
 
-/// Semantic colours that map transfer states to visual indicators.
 abstract class TransferColors {
   static const queued   = Color(0xFF6B7280);
   static const running  = Color(0xFF1A56DB);
@@ -149,14 +140,14 @@ abstract class TransferColors {
 
   static Color forStatus(String status) {
     return switch (status) {
-      'queued'    => queued,
+      'queued' => queued,
       'preparing' => running,
-      'running'   => running,
-      'paused'    => paused,
+      'running' => running,
+      'paused' => paused,
       'completed' => completed,
-      'failed'    => failed,
+      'failed' => failed,
       'cancelled' => cancelled,
-      _           => queued,
+      _ => queued,
     };
   }
 }

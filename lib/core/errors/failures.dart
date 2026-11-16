@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Sealed hierarchy of domain failures.
-/// UI and use-cases receive Failure objects; they never see raw exceptions.
 sealed class Failure extends Equatable {
   const Failure(this.message);
 
@@ -15,7 +13,6 @@ sealed class Failure extends Equatable {
 }
 
 // Network
-
 class NetworkFailure extends Failure {
   const NetworkFailure([super.message = 'No internet connection']);
 }
@@ -29,7 +26,6 @@ class ConnectionFailure extends Failure {
 }
 
 // Server
-
 class ServerFailure extends Failure {
   const ServerFailure(super.message, {this.statusCode});
   final int? statusCode;
@@ -66,7 +62,6 @@ class RateLimitFailure extends Failure {
 }
 
 // Transfer
-
 class TransferFailure extends Failure {
   const TransferFailure(super.message);
 }
@@ -96,7 +91,6 @@ class PartialDownloadCorruptedFailure extends Failure {
 }
 
 // File / Storage
-
 class FileNotFoundFailure extends Failure {
   const FileNotFoundFailure([super.message = 'File not found']);
 }
@@ -109,14 +103,16 @@ class InvalidFileFailure extends Failure {
   const InvalidFileFailure([super.message = 'Invalid or unreadable file']);
 }
 
-// Auth
+class UnsupportedFileTypeFailure extends Failure {
+  const UnsupportedFileTypeFailure([super.message = 'This file type is not allowed by the server']);
+}
 
+// Auth
 class AuthFailure extends Failure {
   const AuthFailure([super.message = 'Invalid username or password']);
 }
 
-// Unknown
-
+// Unknown Error
 class UnknownFailure extends Failure {
   const UnknownFailure([super.message = 'An unexpected error occurred']);
 }

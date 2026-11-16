@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/services/notification_service.dart';
 import '../../features/authentication/presentation/providers/auth_provider.dart';
 import '../../features/authentication/presentation/screens/login_screen.dart';
 import '../../features/authentication/presentation/screens/splash_screen.dart';
@@ -12,26 +13,34 @@ import '../../features/transfers/presentation/screens/transfer_history_screen.da
 import '../../features/uploads/presentation/screens/upload_screen.dart';
 
 abstract class Routes {
-  static const splash         = '/splash';
-  static const login          = '/login';
-  static const dashboard      = '/dashboard';
-  static const upload         = '/upload';
-  static const download       = '/download';
-  static const history        = '/history';
+  static const splash = '/splash';
+  static const login = '/login';
+  static const dashboard = '/dashboard';
+  static const upload = '/upload';
+  static const download = '/download';
+  static const history = '/history';
   static const transferDetail = '/transfers/:id';
 
   static String detailPath(String id) => '/transfers/$id';
+
+  static String payloadToRoute(String payload) {
+    return switch (payload) {
+      'upload' => upload,
+      'download' => download,
+      'history' => history,
+      _ => payload.startsWith('/') ? payload : dashboard,
+    };
+  }
 }
 
 // Router provider
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authNotifier = ref.watch(authNotifierProvider);
-
   return GoRouter(
     initialLocation: Routes.splash,
     refreshListenable: _AuthListenable(ref),
     redirect: (context, state) {
+      final authNotifier = ref.read(authNotifierProvider);
       final current = state.matchedLocation;
       final onSplash = current == Routes.splash;
       final onLogin = current == Routes.login;
@@ -44,9 +53,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final isAuth = authNotifier.valueOrNull?.isAuthenticated ?? false;
 
-      // Session resolved → leave splash/login for the right destination.
+      // Session resolved → leave splash/login for destination.
       if (isAuth) {
-        return (onSplash || onLogin) ? Routes.dashboard : null;
+        if (onSplash || onLogin) {
+          final pendingPayload = NotificationService.instance.consumePendingRoute();
+          if (pendingPayload != null) {
+            return Routes.payloadToRoute(pendingPayload);
+          }
+          return Routes.dashboard;
+        }
+        return null;
       }
 
       // Not authenticated → login (unless already there).
@@ -108,10 +124,10 @@ class _AppShell extends ConsumerWidget {
   final Widget child;
 
   static const _tabs = [
-    (icon: Icons.dashboard_outlined,          label: 'Dashboard', path: Routes.dashboard),
-    (icon: Icons.upload_file_outlined,         label: 'Upload',    path: Routes.upload),
-    (icon: Icons.download_for_offline_outlined,label: 'Download',  path: Routes.download),
-    (icon: Icons.history_outlined,             label: 'History',   path: Routes.history),
+    (icon: Icons.dashboard_outlined, label: 'Dashboard', path: Routes.dashboard),
+    (icon: Icons.upload_file_outlined, label: 'Upload',    path: Routes.upload),
+    (icon: Icons.download_for_offline_outlined, label: 'Download',  path: Routes.download),
+    (icon: Icons.history_outlined, label: 'History',   path: Routes.history),
   ];
 
   @override

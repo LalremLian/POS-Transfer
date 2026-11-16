@@ -7,16 +7,12 @@ import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/auth_token.dart';
 import '../../domain/repositories/auth_repository.dart';
 
-// Repository
-
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryImpl(
     remoteDataSource: AuthRemoteDataSourceImpl(ref.watch(dioProvider)),
     storageService: ref.watch(storageServiceProvider),
   );
 });
-
-// State
 
 class AuthNotifier extends AsyncNotifier<AuthState> {
   @override

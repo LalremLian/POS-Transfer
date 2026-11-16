@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Brief branded screen shown while the app restores the persisted session.
-///
-/// This screen owns no logic. The GoRouter redirect decides when to leave it:
-/// once [authNotifierProvider] resolves, the router redirects to /dashboard
-/// (token valid) or /login (no token).
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -18,7 +13,6 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Brand mark
             Container(
               width: 96,
               height: 96,

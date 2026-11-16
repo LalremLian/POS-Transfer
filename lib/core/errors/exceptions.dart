@@ -64,6 +64,11 @@ class TransferCancelledException implements Exception {
   final String message;
 }
 
+class FileNotFoundException implements Exception {
+  const FileNotFoundException([this.message = 'File not found']);
+  final String message;
+}
+
 class ChecksumException implements Exception {
   const ChecksumException([this.message = 'Checksum mismatch']);
   final String message;

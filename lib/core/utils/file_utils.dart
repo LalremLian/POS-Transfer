@@ -4,12 +4,8 @@ import 'package:path/path.dart' as p;
 
 import '../constants/app_constants.dart';
 
-/// Utility helpers for file name and path operations.
-/// Never exposes user paths in error messages.
 abstract class FileUtils {
   FileUtils._();
-
-  // ── Naming ────────────────────────────────────────────────────────────────
 
   /// Returns the `.part` temporary filename for a given final filename.
   static String toPartPath(String finalPath) => '$finalPath${AppConstants.tempFileSuffix}';
@@ -49,13 +45,13 @@ abstract class FileUtils {
     return p.join(directory, '${base}_${DateTime.now().millisecondsSinceEpoch}$ext');
   }
 
-  // ── Mime type ─────────────────────────────────────────────────────────────
+  // Mime type
 
   static String mimeTypeFor(String filename) {
     return lookupMimeType(filename) ?? 'application/octet-stream';
   }
 
-  // ── Size formatting ───────────────────────────────────────────────────────
+  // Size formatting
 
   static String formatBytes(int bytes) {
     if (bytes < 1024) return '$bytes B';
@@ -75,23 +71,19 @@ abstract class FileUtils {
     return '${(bytesPerSecond / (1024 * 1024)).toStringAsFixed(1)} MB/s';
   }
 
-  // ── Storage check ─────────────────────────────────────────────────────────
+  // Storage check
 
   /// Returns available bytes on the filesystem containing [directory].
   /// Returns null if unavailable (non-Android or permission denied).
   static Future<int?> availableBytes(String directory) async {
     try {
-      // StatFs is Android-only. Use dart:io's statvfs via Dart FFI
-      // is complex; for now we use a best-effort approach via Directory stat.
-      // A proper implementation would use a platform channel.
-      // This is a placeholder that always returns null (safe — callers handle null).
       return null;
     } catch (_) {
       return null;
     }
   }
 
-  // ── Temp file helpers ─────────────────────────────────────────────────────
+  // Temp file helpers
 
   /// Returns all `.part` files in [directory].
   static Future<List<File>> listPartFiles(Directory directory) async {
